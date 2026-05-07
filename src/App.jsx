@@ -3,9 +3,73 @@ import CHEMISTRY_DATA from "./data/chemistry.js";
 import BIOLOGY_DATA from "./data/biology.js";
 import CS_DATA from "./data/cs.js";
 import Game from "./components/Game";
+import { ThemeProvider, useTheme } from "./ThemeContext";
 
-export default function App() {
+function makeSelectorStyles(theme) {
+  return {
+    page: {
+      position: "relative",
+      minHeight: "100vh",
+      background: theme.pageBg,
+      color: theme.text,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      fontFamily: "'DM Sans', sans-serif",
+      padding: "2rem",
+    },
+    themeToggle: {
+      position: "absolute",
+      top: "1.25rem",
+      right: "1.5rem",
+      background: "none",
+      border: "none",
+      fontSize: "1.5rem",
+      cursor: "pointer",
+    },
+    title: {
+      fontFamily: "'DM Serif Display', serif",
+      fontSize: "3rem",
+      color: theme.accent,
+      margin: "0 0 0.5rem",
+    },
+    subtitle: {
+      color: theme.textMuted,
+      fontSize: "1rem",
+      margin: "0 0 2.5rem",
+    },
+    grid: {
+      display: "flex",
+      gap: "1rem",
+      flexWrap: "wrap",
+      justifyContent: "center",
+    },
+    card: {
+      background: theme.surface,
+      border: `1px solid ${theme.surfaceBorder}`,
+      borderRadius: "16px",
+      padding: "2rem 2.5rem",
+      cursor: "pointer",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "0.75rem",
+      transition: "background 0.2s",
+      fontFamily: "'DM Sans', sans-serif",
+    },
+    emoji: { fontSize: "3rem" },
+    label: {
+      color: theme.text,
+      fontSize: "1rem",
+      fontWeight: 500,
+    },
+  };
+}
+
+function AppContent() {
   const [subject, setSubject] = useState(null);
+  const { theme, toggleTheme } = useTheme();
 
   const subjects = [
     { name: "Chemistry", data: CHEMISTRY_DATA, emoji: "⚗️" },
@@ -14,18 +78,22 @@ export default function App() {
   ];
 
   if (subject === null) {
+    const s = makeSelectorStyles(theme);
     return (
-      <div style={selectorStyles.page}>
-        <h1 style={selectorStyles.title}>A–Z Revision</h1>
-        <p style={selectorStyles.subtitle}>Choose a subject to begin</p>
-        <div style={selectorStyles.grid}>
-          {subjects.map((s) => (
+      <div style={s.page}>
+        <button style={s.themeToggle} onClick={toggleTheme} title="Toggle theme">
+          {theme.id === "dark" ? "☀️" : "🌙"}
+        </button>
+        <h1 style={s.title}>A–Z Revision</h1>
+        <p style={s.subtitle}>Choose a subject to begin</p>
+        <div style={s.grid}>
+          {subjects.map((sub) => (
             <button
-              key={s.name}
-              style={selectorStyles.card}
-              onClick={() => setSubject(s)}>
-              <span style={selectorStyles.emoji}>{s.emoji}</span>
-              <span style={selectorStyles.label}>{s.name}</span>
+              key={sub.name}
+              style={s.card}
+              onClick={() => setSubject(sub)}>
+              <span style={s.emoji}>{sub.emoji}</span>
+              <span style={s.label}>{sub.name}</span>
             </button>
           ))}
         </div>
@@ -37,56 +105,16 @@ export default function App() {
       data={subject.data}
       subjectLabel={subject.name}
       onBack={() => setSubject(null)}
+      theme={theme}
+      onToggleTheme={toggleTheme}
     />
   );
 }
 
-const selectorStyles = {
-  page: {
-    minHeight: "100vh",
-    background:
-      "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2027 100%)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    fontFamily: "'DM Sans', sans-serif",
-    padding: "2rem",
-  },
-  title: {
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: "3rem",
-    color: "#38bdf8",
-    margin: "0 0 0.5rem",
-  },
-  subtitle: {
-    color: "#94a3b8",
-    fontSize: "1rem",
-    margin: "0 0 2.5rem",
-  },
-  grid: {
-    display: "flex",
-    gap: "1rem",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
-  card: {
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "16px",
-    padding: "2rem 2.5rem",
-    cursor: "pointer",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "0.75rem",
-    transition: "background 0.2s",
-    fontFamily: "'DM Sans', sans-serif",
-  },
-  emoji: { fontSize: "3rem" },
-  label: {
-    color: "#f1f5f9",
-    fontSize: "1rem",
-    fontWeight: 500,
-  },
-};
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}

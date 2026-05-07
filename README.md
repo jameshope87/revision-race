@@ -2,7 +2,7 @@
 
 Classroom revision game built with React + Vite.
 
-Students guess an A-Z keyword from an image, answer short questions, and then unlock the next letter using a teacher code.
+Students guess an A-Z keyword from an image or hint, answer short questions, and then unlock the next letter using a teacher code.
 
 ## Features
 
@@ -13,6 +13,8 @@ Students guess an A-Z keyword from an image, answer short questions, and then un
 - Teacher code gate between letters.
 - Teacher reference panel to view all generated letter codes.
 - Visual progress tracker and completion screen.
+- Light/dark theme toggle.
+- Theme preference saved in local storage and restored on reload.
 
 ## Tech Stack
 
@@ -61,6 +63,8 @@ npm run preview
 4. Enter the teacher code to unlock the next letter.
 5. Repeat until all letters are complete.
 
+The theme toggle is available from the subject picker and during the game.
+
 Teacher panel password is currently:
 
 `default`
@@ -74,7 +78,7 @@ Each letter entry should use this structure:
 	letter: "A",
 	keywords: ["activation energy", "activation energies"],
 	hint: "Short hint shown when player taps hint",
-	image: aImg,
+	image: aImg, // may also be null for text-only cards
 	questions: [
 		"Short question 1",
 		"Short question 2",
@@ -87,13 +91,15 @@ Each letter entry should use this structure:
 
 ```text
 src/
-	App.jsx                 # Subject selector and game entry
+	App.jsx                 # Subject selector and app shell
+	ThemeContext.jsx        # Theme state and localStorage persistence
+	themes.js               # Light/dark theme token definitions
 	components/
 		Game.jsx              # Main game loop, stages, teacher panel
 	data/
 		chemistry.js          # Chemistry A-Z data
-		biology.js            # Biology data (currently partial)
-		cs.js                 # Computer Science data (currently partial)
+		biology.js            # Biology A-Z data
+		cs.js                 # Computer Science A-Z data
 	assets/
 		chemistry/            # Chemistry letter images
 		compsci/              # Computer Science images
@@ -102,10 +108,11 @@ src/
 ## Current Content Status
 
 - Chemistry: full A-Z set with short-answer prompts.
-- Biology: placeholder sample entries only.
-- Computer Science: placeholder sample entries only.
+- Biology: full A-Z set.
+- Computer Science: full A-Z set.
 
 ## Notes
 
 - Game logic currently reads `keywords` (array) for answer matching.
-- If a subject entry uses `keyword` (singular) instead, update it to `keywords` to avoid runtime issues.
+- Theme preference is stored under `theme` in local storage.
+- Some entries can use `image: null` and still work because the hint/question flow remains available.

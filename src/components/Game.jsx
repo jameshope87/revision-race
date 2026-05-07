@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 const TEACHER_PASSWORD = "default";
 
-function TeacherPanel({ data }) {
+function TeacherPanel({ data, theme }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [pwInput, setPwInput] = useState("");
   const [pwError, setPwError] = useState(false);
   const [shake, setShake] = useState(false);
   const inputRef = useRef(null);
+  const styles = makeStyles(theme);
 
   useEffect(() => {
     if (modalOpen && !unlocked) setTimeout(() => inputRef.current?.focus(), 50);
@@ -127,7 +128,7 @@ const STAGES = {
   COMPLETE: "complete",
 };
 
-export default function Game({ data, subjectLabel, onBack }) {
+export default function Game({ data, subjectLabel, onBack, theme, onToggleTheme }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [stage, setStage] = useState(STAGES.GUESS);
   const [guessInput, setGuessInput] = useState("");
@@ -143,6 +144,7 @@ export default function Game({ data, subjectLabel, onBack }) {
 
   const current = data[currentIndex];
   const expectedCode = generateCode(current.letter);
+  const styles = makeStyles(theme);
 
   useEffect(() => {
     if (stage === STAGES.GUESS) guessRef.current?.focus();
@@ -239,6 +241,9 @@ export default function Game({ data, subjectLabel, onBack }) {
           <div style={styles.progressBar}>
             <div style={{ ...styles.progressFill, width: `${progress}%` }} />
           </div>
+          <button style={styles.themeToggle} onClick={onToggleTheme} title="Toggle theme">
+            {theme.id === "dark" ? "☀️" : "🌙"}
+          </button>
         </div>
       </header>
 
@@ -253,11 +258,15 @@ export default function Game({ data, subjectLabel, onBack }) {
 
           {/* Image / emoji display */}
           <div style={styles.imageBox}>
-            <img
-              src={current.image}
-              alt={current.keywords[0]}
-              style={styles.image}
-            />
+            {current.image ? (
+              <img
+                src={current.image}
+                alt={current.keywords[0]}
+                style={styles.image}
+              />
+            ) : (
+              <div style={styles.imagePlaceholder}>{current.letter}</div>
+            )}
             {stage === STAGES.GUESS && (
               <p style={styles.imageHint}>
                 What {subjectLabel} keyword does this represent?
@@ -377,19 +386,19 @@ export default function Game({ data, subjectLabel, onBack }) {
         </div>
 
         {/* Teacher panel */}
-        <TeacherPanel data={data} />
+        <TeacherPanel data={data} theme={theme} />
       </main>
     </div>
   );
 }
 
-const styles = {
+function makeStyles(t) {
+  return {
   page: {
     minHeight: "100vh",
-    background:
-      "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2027 100%)",
+    background: t.pageBg,
     fontFamily: "'DM Sans', sans-serif",
-    color: "#f1f5f9",
+    color: t.text,
     padding: "0 0 3rem",
   },
   header: {
@@ -397,29 +406,29 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "1.25rem 2rem",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
-    background: "rgba(255,255,255,0.03)",
+    borderBottom: `1px solid ${t.headerBorder}`,
+    background: t.headerBg,
     backdropFilter: "blur(8px)",
   },
   headerLeft: { display: "flex", alignItems: "baseline", gap: "0.5rem" },
   logo: {
     fontFamily: "'DM Serif Display', serif",
     fontSize: "1.6rem",
-    color: "#38bdf8",
+    color: t.accent,
     letterSpacing: "0.05em",
   },
-  logoSub: { fontSize: "0.85rem", color: "#94a3b8", fontWeight: 400 },
+  logoSub: { fontSize: "0.85rem", color: t.textMuted, fontWeight: 400 },
   progressArea: { display: "flex", alignItems: "center", gap: "0.75rem" },
   progressLabel: {
     fontSize: "0.8rem",
-    color: "#94a3b8",
+    color: t.textMuted,
     minWidth: "3.5rem",
     textAlign: "right",
   },
   progressBar: {
     width: "140px",
     height: "6px",
-    background: "rgba(255,255,255,0.1)",
+    background: "rgba(128,128,128,0.2)",
     borderRadius: "99px",
     overflow: "hidden",
   },
@@ -428,6 +437,14 @@ const styles = {
     background: "linear-gradient(90deg, #38bdf8, #818cf8)",
     borderRadius: "99px",
     transition: "width 0.6s ease",
+  },
+  themeToggle: {
+    background: "none",
+    border: "none",
+    fontSize: "1.3rem",
+    cursor: "pointer",
+    padding: "0 0.25rem",
+    marginLeft: "0.5rem",
   },
   main: {
     maxWidth: "640px",
@@ -439,8 +456,8 @@ const styles = {
     animation: "fadeIn 0.4s ease",
   },
   card: {
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: t.surface,
+    border: `1px solid ${t.surfaceBorder}`,
     borderRadius: "20px",
     overflow: "hidden",
     backdropFilter: "blur(16px)",
@@ -458,7 +475,7 @@ const styles = {
   imageBox: {
     padding: "2rem 1.5rem 1rem",
     textAlign: "center",
-    borderBottom: "1px solid rgba(255,255,255,0.07)",
+    borderBottom: `1px solid ${t.imageBoxBorder}`,
   },
   imageEmoji: {
     fontSize: "4.5rem",
@@ -473,7 +490,21 @@ const styles = {
     display: "block",
     margin: "0 auto 0.75rem",
   },
-  imageHint: { fontSize: "0.9rem", color: "#94a3b8", margin: 0 },
+  imagePlaceholder: {
+    width: "180px",
+    height: "180px",
+    borderRadius: "16px",
+    background: t.placeholderBg,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "5rem",
+    fontFamily: "'DM Serif Display', serif",
+    color: t.accent,
+    margin: "0 auto 0.75rem",
+    border: `1px solid ${t.surfaceBorder}`,
+  },
+  imageHint: { fontSize: "0.9rem", color: t.textMuted, margin: 0 },
   hintRow: {
     marginTop: "0.9rem",
     display: "flex",
@@ -507,10 +538,10 @@ const styles = {
   inputRow: { display: "flex", gap: "0.5rem", justifyContent: "center" },
   input: {
     flex: 1,
-    background: "rgba(255,255,255,0.07)",
-    border: "1.5px solid rgba(255,255,255,0.15)",
+    background: t.inputBg,
+    border: `1.5px solid ${t.inputBorder}`,
     borderRadius: "10px",
-    color: "#f1f5f9",
+    color: t.inputText,
     fontSize: "1rem",
     padding: "0.6rem 0.9rem",
     outline: "none",
@@ -553,8 +584,8 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    background: "rgba(56,189,248,0.1)",
-    border: "1px solid rgba(56,189,248,0.25)",
+    background: t.id === "dark" ? "rgba(56,189,248,0.1)" : "rgba(2,132,199,0.1)",
+    border: t.id === "dark" ? "1px solid rgba(56,189,248,0.25)" : "1px solid rgba(2,132,199,0.25)",
     borderRadius: "10px",
     padding: "0.75rem 1rem",
     marginBottom: "1rem",
@@ -562,13 +593,13 @@ const styles = {
   correctKeyword: {
     fontFamily: "'DM Serif Display', serif",
     fontSize: "1.4rem",
-    color: "#38bdf8",
+    color: t.accent,
     letterSpacing: "0.02em",
   },
   correctTick: { fontSize: "1.2rem", color: "#4ade80" },
   questionIntro: {
     fontSize: "0.9rem",
-    color: "#94a3b8",
+    color: t.textMuted,
     margin: "0 0 0.75rem",
   },
   questionList: {
@@ -578,10 +609,10 @@ const styles = {
     flexDirection: "column",
     gap: "0.6rem",
   },
-  questionItem: { fontSize: "0.95rem", color: "#e2e8f0", lineHeight: 1.55 },
+  questionItem: { fontSize: "0.95rem", color: t.questionItemColor, lineHeight: 1.55 },
   codePrompt: {
     fontSize: "0.9rem",
-    color: "#94a3b8",
+    color: t.textMuted,
     margin: "0 0 0.75rem",
     textAlign: "center",
   },
@@ -600,27 +631,28 @@ const styles = {
     justifyContent: "center",
     fontSize: "0.8rem",
     fontWeight: 600,
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    color: "#64748b",
+    background: t.trackerChipBg,
+    border: `1px solid ${t.trackerChipBorder}`,
+    color: t.textDim,
     transition: "all 0.3s ease",
   },
   trackerDone: {
-    background: "rgba(56,189,248,0.15)",
-    border: "1px solid rgba(56,189,248,0.4)",
-    color: "#38bdf8",
+    background: t.completedChipBg,
+    border: `1px solid ${t.completedChipBorder}`,
+    color: t.accent,
   },
   trackerCurrent: {
-    background:
-      "linear-gradient(135deg, rgba(56,189,248,0.25), rgba(129,140,248,0.25))",
-    border: "1.5px solid #818cf8",
-    color: "#c7d2fe",
+    background: t.id === "dark"
+      ? "linear-gradient(135deg, rgba(56,189,248,0.25), rgba(129,140,248,0.25))"
+      : "linear-gradient(135deg, rgba(2,132,199,0.2), rgba(99,102,241,0.2))",
+    border: `1.5px solid ${t.accentSecondary}`,
+    color: t.id === "dark" ? "#c7d2fe" : t.accentSecondary,
   },
   teacherBtn: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: t.teacherBtnBg,
+    border: `1px solid ${t.teacherBtnBorder}`,
     borderRadius: "12px",
-    color: "#94a3b8",
+    color: t.textMuted,
     fontFamily: "'DM Sans', sans-serif",
     fontSize: "0.85rem",
     fontWeight: 500,
@@ -642,8 +674,8 @@ const styles = {
     padding: "1rem",
   },
   modal: {
-    background: "#1e293b",
-    border: "1px solid rgba(255,255,255,0.12)",
+    background: t.modalBg,
+    border: `1px solid ${t.modalBorder}`,
     borderRadius: "20px",
     width: "100%",
     maxWidth: "520px",
@@ -657,19 +689,19 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "1rem 1.25rem",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    borderBottom: `1px solid ${t.modalHeaderBorder}`,
     flexShrink: 0,
   },
   modalTitle: {
     fontFamily: "'DM Sans', sans-serif",
     fontSize: "0.95rem",
     fontWeight: 600,
-    color: "#f1f5f9",
+    color: t.text,
   },
   closeBtn: {
     background: "none",
     border: "none",
-    color: "#64748b",
+    color: t.textDim,
     fontSize: "1rem",
     cursor: "pointer",
     padding: "2px 6px",
@@ -681,11 +713,11 @@ const styles = {
     overflowY: "auto",
     flex: 1,
   },
-  pwPrompt: { fontSize: "0.9rem", color: "#94a3b8", margin: "0 0 0.75rem" },
-  pwHint: { fontSize: "0.78rem", color: "#475569", margin: "0.75rem 0 0" },
+  pwPrompt: { fontSize: "0.9rem", color: t.textMuted, margin: "0 0 0.75rem" },
+  pwHint: { fontSize: "0.78rem", color: t.textDim, margin: "0.75rem 0 0" },
   code: {
-    background: "rgba(56,189,248,0.1)",
-    color: "#38bdf8",
+    background: t.id === "dark" ? "rgba(56,189,248,0.1)" : "rgba(2,132,199,0.1)",
+    color: t.accent,
     padding: "1px 6px",
     borderRadius: "4px",
     fontFamily: "'Courier New', monospace",
@@ -701,13 +733,13 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     padding: "4px 0",
-    borderBottom: "1px solid rgba(255,255,255,0.04)",
+    borderBottom: `1px solid ${t.codeRowBorder}`,
     fontSize: "0.82rem",
   },
-  codeRowLetter: { color: "#94a3b8" },
+  codeRowLetter: { color: t.textMuted },
   codeRowCode: {
     fontFamily: "'Courier New', monospace",
-    color: "#38bdf8",
+    color: t.accent,
     fontWeight: 600,
     letterSpacing: "0.15em",
   },
@@ -715,8 +747,8 @@ const styles = {
     maxWidth: "480px",
     margin: "4rem auto",
     textAlign: "center",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: t.surface,
+    border: `1px solid ${t.surfaceBorder}`,
     borderRadius: "24px",
     padding: "3rem 2rem",
   },
@@ -725,9 +757,9 @@ const styles = {
     fontFamily: "'DM Serif Display', serif",
     fontSize: "2rem",
     margin: "0 0 0.5rem",
-    color: "#38bdf8",
+    color: t.accent,
   },
-  completeSubtitle: { color: "#94a3b8", margin: "0 0 2rem" },
+  completeSubtitle: { color: t.textMuted, margin: "0 0 2rem" },
   completedGrid: {
     display: "flex",
     flexWrap: "wrap",
@@ -738,9 +770,9 @@ const styles = {
     width: "36px",
     height: "36px",
     borderRadius: "8px",
-    background: "rgba(56,189,248,0.15)",
-    border: "1px solid rgba(56,189,248,0.4)",
-    color: "#38bdf8",
+    background: t.completedChipBg,
+    border: `1px solid ${t.completedChipBorder}`,
+    color: t.accent,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -750,10 +782,11 @@ const styles = {
   backBtn: {
     background: "none",
     border: "none",
-    color: "#94a3b8",
+    color: t.textMuted,
     fontFamily: "'DM Sans', sans-serif",
     fontSize: "0.85rem",
     cursor: "pointer",
     padding: "0 0.5rem 0 0",
   },
-};
+  };
+}
