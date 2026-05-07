@@ -2,6 +2,7 @@ import { useState } from "react";
 import CHEMISTRY_DATA from "./data/chemistry.js";
 import BIOLOGY_DATA from "./data/biology.js";
 import CS_DATA from "./data/cs.js";
+import PHYSICS_DATA from "./data/physics.js";
 import Game from "./components/Game";
 import { ThemeProvider, useTheme } from "./ThemeContext";
 
@@ -75,6 +76,7 @@ function AppContent() {
     { name: "Chemistry", data: CHEMISTRY_DATA, emoji: "⚗️" },
     { name: "Biology", data: BIOLOGY_DATA, emoji: "🧬" },
     { name: "Computer Science", data: CS_DATA, emoji: "💻" },
+    { name: "Physics", data: PHYSICS_DATA, emoji: "⚛️" },
   ];
 
   if (subject === null) {
