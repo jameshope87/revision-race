@@ -6,7 +6,11 @@ const ThemeContext = createContext(null);
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("theme");
-    return saved === "light" ? lightTheme : darkTheme;
+    if (saved === "light") return lightTheme;
+    if (saved === "dark") return darkTheme;
+    return window.matchMedia("(prefers-color-scheme: light)").matches
+      ? lightTheme
+      : darkTheme;
   });
 
   function toggleTheme() {
