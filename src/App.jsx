@@ -83,7 +83,10 @@ function AppContent() {
     const s = makeSelectorStyles(theme);
     return (
       <div style={s.page}>
-        <button style={s.themeToggle} onClick={toggleTheme} title="Toggle theme">
+        <button
+          style={s.themeToggle}
+          onClick={toggleTheme}
+          title="Toggle theme">
           {theme.id === "dark" ? "☀️" : "🌙"}
         </button>
         <h1 style={s.title}>A–Z Revision</h1>
