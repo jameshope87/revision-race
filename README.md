@@ -1,16 +1,111 @@
-# React + Vite
+# A-Z Revision Race
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Classroom revision game built with React + Vite.
 
-Currently, two official plugins are available:
+Students guess an A-Z keyword from an image, answer short questions, and then unlock the next letter using a teacher code.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Subject selector for Chemistry, Biology, and Computer Science.
+- A-Z progression with one challenge card per letter.
+- Keyword guessing with support for alternate accepted terms (via keyword list).
+- Short-answer question stage for quick classroom pacing.
+- Teacher code gate between letters.
+- Teacher reference panel to view all generated letter codes.
+- Visual progress tracker and completion screen.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React 19
+- Vite 8
+- ESLint 10
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Getting Started
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Run in development
+
+```bash
+npm run dev
+```
+
+### 3. Build for production
+
+```bash
+npm run build
+```
+
+### 4. Preview production build
+
+```bash
+npm run preview
+```
+
+## Scripts
+
+- `npm run dev` - Start Vite dev server.
+- `npm run build` - Build production assets.
+- `npm run preview` - Preview the built app locally.
+- `npm run lint` - Run ESLint.
+
+## Gameplay Flow
+
+1. Pick a subject.
+2. Guess the keyword shown by the image card.
+3. Answer the short questions on a mini whiteboard.
+4. Enter the teacher code to unlock the next letter.
+5. Repeat until all letters are complete.
+
+Teacher panel password is currently:
+
+`default`
+
+## Data Format
+
+Each letter entry should use this structure:
+
+```js
+{
+	letter: "A",
+	keywords: ["activation energy", "activation energies"],
+	hint: "Short hint shown when player taps hint",
+	image: aImg,
+	questions: [
+		"Short question 1",
+		"Short question 2",
+		"Short question 3"
+	]
+}
+```
+
+## Project Structure
+
+```text
+src/
+	App.jsx                 # Subject selector and game entry
+	components/
+		Game.jsx              # Main game loop, stages, teacher panel
+	data/
+		chemistry.js          # Chemistry A-Z data
+		biology.js            # Biology data (currently partial)
+		cs.js                 # Computer Science data (currently partial)
+	assets/
+		chemistry/            # Chemistry letter images
+		compsci/              # Computer Science images
+```
+
+## Current Content Status
+
+- Chemistry: full A-Z set with short-answer prompts.
+- Biology: placeholder sample entries only.
+- Computer Science: placeholder sample entries only.
+
+## Notes
+
+- Game logic currently reads `keywords` (array) for answer matching.
+- If a subject entry uses `keyword` (singular) instead, update it to `keywords` to avoid runtime issues.
