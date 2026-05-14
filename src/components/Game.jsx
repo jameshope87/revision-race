@@ -149,7 +149,6 @@ export default function Game({
   const codeRef = useRef(null);
 
   const current = data[currentIndex];
-  const expectedCode = generateCode(current.letter);
   const styles = makeStyles(theme);
 
   useEffect(() => {
